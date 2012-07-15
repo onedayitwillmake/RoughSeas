@@ -8,12 +8,16 @@
 #ifndef DRAWUTILS_H_
 #define DRAWUTILS_H_
 
+#include "cinder/TriMesh.h"
+
 namespace zoa {
 
 class DrawUtils {
 public:
 	// Creates a plane of 'width' with 'sW', 'sH' segements at 'offset' and places geometry into 'mesh'
-//	static void createPlane( ci::TriMesh& mesh, ci::Vec3f offset, float width, float height, int segmentsW, int segmentsH );
+	static void createPlaneWithTriMesh( ci::TriMesh& mesh, size_t width, size_t depth );
+	static void calculateTrimeshNormals( ci::TriMesh& mesh );
+	static void drawTrimeshNormals( ci::TriMesh& mesh );
 };
 
 } /* namespace zoa */

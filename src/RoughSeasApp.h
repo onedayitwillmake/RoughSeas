@@ -5,6 +5,7 @@
 #include "cinder/Camera.h"
 #include "cinder/gl/Vbo.h"
 #include "cinder/gl/GlslProg.h"
+#include "cinder/Perlin.h"
 #include "Resources.h"
 
 class RoughSeasApp : public ci::app::AppBasic {
@@ -24,9 +25,13 @@ public:
 	void keyDown( ci::app::KeyEvent event );
 
 	ci::TriMesh			mTriMesh;
+
 	ci::CameraPersp		mCamera;
 	ci::Vec3f			mEyePoint;
+
 	ci::gl::GlslProg	mShader;
 
-	ci::gl::VboMesh mVboMesh;
+	ci::gl::VboMesh		mVboMesh;
+
+	ci::Perlin			noise;
 };
