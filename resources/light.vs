@@ -21,7 +21,7 @@ void main( void ) {
 	vec3 L = normalize( uLightDirection );
 	float lambertTerm = dot( N, -L );
 
-	vFinalColor = uMaterialDiffuse * uLightDiffuse * lambertTerm;
+	vFinalColor = uMaterialDiffuse * uLightDiffuse * gl_Color * lambertTerm;
 	vFinalColor.a = 1.0;
 
 	gl_Position = uPMatrix * uMVMatrix * vec4( gl_Vertex.xyz, 1.0 );
