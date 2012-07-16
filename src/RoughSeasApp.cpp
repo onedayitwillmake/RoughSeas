@@ -86,7 +86,7 @@ void RoughSeasApp::update() {
 		ci::Vec3f& v2 = mTriMesh.getVertices()[ mTriMesh.getIndices()[i * 3 + 2] ];
 
 		float scaleFactor = 0.05;
-		float yValue = noise.fBm( v0.x*scaleFactor + getElapsedFrames() * scaleFactor * scaleFactor, v0.z*scaleFactor,  getElapsedFrames() * scaleFactor * scaleFactor ) * 6;
+		float yValue = noise.fBm( v0.x*scaleFactor + getElapsedFrames() * scaleFactor * scaleFactor, v0.z*scaleFactor,  getElapsedFrames() * scaleFactor * scaleFactor ) * 16;
 		v0.y = yValue;
 		v1.y = yValue;//noise.fBm( v1.x*scaleFactor, v1.z*scaleFactor, getElapsedFrames() * scaleFactor * scaleFactor ) * 3;
 		v2.y = yValue;//noise.fBm( v2.x*scaleFactor, v2.z*scaleFactor, getElapsedFrames() * scaleFactor * scaleFactor ) * 3;
