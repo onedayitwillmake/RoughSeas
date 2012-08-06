@@ -38,17 +38,38 @@ void RoughSeasApp::setup() {
 		quit();
 	}
 
+	// Make a bird
+	bird.appendVertex( ci::Vec3f( 5, 0, 0 ) );
+	bird.appendVertex( ci::Vec3f( -5, -2, 1 ) );
+	bird.appendVertex( ci::Vec3f( -5, 0, 0 ) );
+	bird.appendVertex( ci::Vec3f( -5, -2, -1 ) );
+
+	bird.appendVertex( ci::Vec3f( 0, 2, -6 ) );
+	bird.appendVertex( ci::Vec3f( 0, 2, 6 ) );
+	bird.appendVertex( ci::Vec3f( 2, 0, 0 ) );
+	bird.appendVertex( ci::Vec3f( -3, 0, 0 ) );
+
+	bird.appendTriangle(0,2,1);
+	bird.appendTriangle(4,7,6);
+	bird.appendTriangle(5,6,7);
+
+	zoa::DrawUtils::calculateTrimeshNormals( bird );
+
+
 	// Params
-	m_uLightDirection = ci::Vec3f(1.0, 0.0, 0.0 );
+	m_uLightDirection = ci::Vec3f(0.01, 0.85, -0.52 );
 	m_uColor = ci::ColorAf(76, 17, 0);
+
+	m_perlinScale = 11.0f;
+	m_uSpecularFactor = 2.0;
+	m_drawWireframe = false;
 
 	mParams = ci::params::InterfaceGl( "App parameters", ci::Vec2i( 200, 400 ) );
 	mParams.addParam( "Color", &m_uColor, "min=0.0 max=1.0 step=0.05" );
 	mParams.addParam( "Light Direction", &m_uLightDirection, "min=0.0 max=1.0 step=0.05" );
 	mParams.addParam( "Shininess", &m_uSpecularFactor, "min=1 max=255 step=1" );
 	mParams.addParam( "Perlin Scale", &m_perlinScale, "min=1 max=255 step=1" );
-
-
+	mParams.addParam( "Draw Wireframe", &m_drawWireframe );
 }
 
 
@@ -111,7 +132,7 @@ void RoughSeasApp::update() {
 // Called every frame
 void RoughSeasApp::draw() {
 	// Clear screen every frame with black
-	ci::gl::clear( ci::Color::black() );
+	ci::gl::clear( ci::Color::white() );
 
 	// Set the color and draw a simple line to the mouse
 	ci::gl::color( ci::ColorA::white() );
@@ -153,12 +174,16 @@ void RoughSeasApp::draw() {
 
 
 	ci::gl::draw( mTriMesh );
+	ci::gl::draw( bird );
 	mShader.unbind();
 
-	ci::gl::color( ci::ColorA(0.5, 0.5, 0.5, 0.5) );
-	ci::gl::enableWireframe();
-	ci::gl::draw( mTriMesh );
-	ci::gl::disableWireframe();
+	if( m_drawWireframe ) {
+		ci::gl::color( ci::ColorA(0.5, 0.5, 0.5, 0.5) );
+		ci::gl::enableWireframe();
+		ci::gl::draw( mTriMesh );
+		ci::gl::draw( bird );
+		ci::gl::disableWireframe();
+	}
 
 	ci::params::InterfaceGl::draw();
 }

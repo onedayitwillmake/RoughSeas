@@ -36,6 +36,7 @@ public:
 	ci::gl::VboMesh		mVboMesh;
 
 	ci::Perlin			noise;
+	ci::TriMesh			bird;
 
 	//
 	ci::params::InterfaceGl		mParams;
@@ -43,4 +44,5 @@ public:
 	ci::ColorA					m_uColor;
 	float						m_uSpecularFactor;
 	float						m_perlinScale;
+	bool						m_drawWireframe;
 };
