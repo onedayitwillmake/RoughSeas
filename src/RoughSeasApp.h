@@ -2,10 +2,12 @@
 #include "cinder/app/MouseEvent.h"
 #include "cinder/TriMesh.h"
 #include "cinder/Vector.h"
+#include "cinder/Color.h"
 #include "cinder/Camera.h"
 #include "cinder/gl/Vbo.h"
 #include "cinder/gl/GlslProg.h"
 #include "cinder/Perlin.h"
+#include "cinder/params/Params.h"
 #include "Resources.h"
 
 class RoughSeasApp : public ci::app::AppBasic {
@@ -34,4 +36,11 @@ public:
 	ci::gl::VboMesh		mVboMesh;
 
 	ci::Perlin			noise;
+
+	//
+	ci::params::InterfaceGl		mParams;
+	ci::Vec3f					m_uLightDirection;
+	ci::ColorA					m_uColor;
+	float						m_uSpecularFactor;
+	float						m_perlinScale;
 };

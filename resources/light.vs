@@ -10,24 +10,15 @@ uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat4 uNMatrix;
 
-uniform vec3 uLightDirection;	// Incoming light source direction
-uniform vec4 uLightDiffuse;		// Light diffuse component
-uniform vec4 uMaterialDiffuse;	// Material diffuse color
-
-varying vec4 vFinalColor;
-varying vec3 ec_pos;
-
+varying vec3 vNormal;
+varying vec4 vPosition;
+varying vec3 vEyeVec;
  
 void main( void ) {
-	vec3 N = normalize( vec3( uNMatrix * vec4( gl_Normal, 1.0) ) );
-	vec3 L = normalize( uLightDirection );
-	float lambertTerm = dot( N, -L );
-
-	ec_pos = (gl_ModelViewMatrix * gl_Vertex).xyz;
-
-
-	vFinalColor = uMaterialDiffuse * uLightDiffuse * gl_Color * lambertTerm;
-	vFinalColor.a = 1.0;
-
+	vec4 vertex = uMVMatrix * vec4( gl_Vertex.xyz, 1.0 );
+	vNormal = vec3( uNMatrix * vec4( gl_Normal, 1.0 ) );
+	vEyeVec = -vec3( vertex.xyz );
+	
 	gl_Position = uPMatrix * uMVMatrix * vec4( gl_Vertex.xyz, 1.0 );
+	vPosition = gl_Position;
 }

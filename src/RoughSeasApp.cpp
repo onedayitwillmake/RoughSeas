@@ -38,6 +38,16 @@ void RoughSeasApp::setup() {
 		quit();
 	}
 
+	// Params
+	m_uLightDirection = ci::Vec3f(1.0, 0.0, 0.0 );
+	m_uColor = ci::ColorAf(76, 17, 0);
+
+	mParams = ci::params::InterfaceGl( "App parameters", ci::Vec2i( 200, 400 ) );
+	mParams.addParam( "Color", &m_uColor, "min=0.0 max=1.0 step=0.05" );
+	mParams.addParam( "Light Direction", &m_uLightDirection, "min=0.0 max=1.0 step=0.05" );
+	mParams.addParam( "Shininess", &m_uSpecularFactor, "min=1 max=255 step=1" );
+	mParams.addParam( "Perlin Scale", &m_perlinScale, "min=1 max=255 step=1" );
+
 
 }
 
@@ -86,7 +96,7 @@ void RoughSeasApp::update() {
 		ci::Vec3f& v2 = mTriMesh.getVertices()[ mTriMesh.getIndices()[i * 3 + 2] ];
 
 		float scaleFactor = 0.05;
-		float yValue = noise.fBm( v0.x*scaleFactor + getElapsedFrames() * scaleFactor * scaleFactor, v0.z*scaleFactor,  getElapsedFrames() * scaleFactor * scaleFactor ) * 16;
+		float yValue = noise.fBm( v0.x*scaleFactor + getElapsedFrames() * scaleFactor * scaleFactor, v0.z*scaleFactor,  getElapsedFrames() * scaleFactor * scaleFactor ) * m_perlinScale;
 		v0.y = yValue;
 		v1.y = yValue;//noise.fBm( v1.x*scaleFactor, v1.z*scaleFactor, getElapsedFrames() * scaleFactor * scaleFactor ) * 3;
 		v2.y = yValue;//noise.fBm( v2.x*scaleFactor, v2.z*scaleFactor, getElapsedFrames() * scaleFactor * scaleFactor ) * 3;
@@ -125,12 +135,32 @@ void RoughSeasApp::draw() {
 //	std::cout << lightDirection.safeNormalized() << std::endl;
 
 	// Light properties
-	mShader.uniform("uLightDirection",  ci::Vec3f(0, -100, -100) );
+	mShader.uniform("uLightDirection",  m_uLightDirection );
+	mShader.uniform("uLightAmbient", ci::ColorA(0.1f, 0.1f, 0.1f, 1.0f ) );
 	mShader.uniform("uLightDiffuse", ci::ColorA::white() );
-	mShader.uniform("uMaterialDiffuse", ci::ColorA( 0.5f, 0.8f, 0.1f, 1.0f ) );
+	mShader.uniform("uLightSpecular", ci::ColorA::white() );
+
+	// Material
+	ci::Vec3f endColor = ci::Vec3f(m_uColor.r, m_uColor.g, m_uColor.b );
+	endColor.safeNormalize();
+
+	mShader.uniform("uMaterialAmbient", ci::ColorA(0.7f, 0.7f, 0.7f, 1.0f ) );
+	mShader.uniform("uMaterialDiffuse", ci::ColorA( endColor.x, endColor.y, endColor.z, 1.0f ) );
+	mShader.uniform("uMaterialSpecular", ci::ColorA::white() );
+
+	// Shininess
+	mShader.uniform("uShininess", m_uSpecularFactor );
+
 
 	ci::gl::draw( mTriMesh );
 	mShader.unbind();
+
+	ci::gl::color( ci::ColorA(0.5, 0.5, 0.5, 0.5) );
+	ci::gl::enableWireframe();
+	ci::gl::draw( mTriMesh );
+	ci::gl::disableWireframe();
+
+	ci::params::InterfaceGl::draw();
 }
 
 void RoughSeasApp::shutdown() {
