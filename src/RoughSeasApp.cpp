@@ -59,6 +59,8 @@ void RoughSeasApp::setup() {
 	// Params
 	m_uLightDirection = ci::Vec3f(0.01, 0.85, -0.52 );
 	m_uColor = ci::ColorAf(76, 17, 0);
+	m_uRotation = ci::Vec3f(1.0, 0.0, 0.0 );
+	m_uTranslation = ci::Vec3f(10.0f, 0.0, 5.0f);
 
 	m_perlinScale = 11.0f;
 	m_uSpecularFactor = 2.0;
@@ -66,6 +68,10 @@ void RoughSeasApp::setup() {
 
 	mParams = ci::params::InterfaceGl( "App parameters", ci::Vec2i( 200, 400 ) );
 	mParams.addParam( "Color", &m_uColor, "min=0.0 max=1.0 step=0.05" );
+	mParams.addParam( "Rotation", &m_uRotation);
+	mParams.addParam( "Position", &m_uTranslation);
+
+
 	mParams.addParam( "Light Direction", &m_uLightDirection, "min=0.0 max=1.0 step=0.05" );
 	mParams.addParam( "Shininess", &m_uSpecularFactor, "min=1 max=255 step=1" );
 	mParams.addParam( "Perlin Scale", &m_perlinScale, "min=1 max=255 step=1" );
@@ -141,8 +147,17 @@ void RoughSeasApp::draw() {
 	ci::gl::enableDepthWrite();
 	ci::gl::enableAlphaBlending();
 
+	// Object props
+	ci::Vec3f rotation = m_uRotation;
+	rotation.safeNormalize();
+	rotation *= M_PI*2;
+
+
+
 	// Camera properties
 	mShader.bind();
+	mShader.uniform( "uTranslation", m_uTranslation );
+	mShader.uniform( "uRotation", rotation );
 	mShader.uniform( "uMVMatrix", mCamera.getModelViewMatrix() );
 	mShader.uniform( "uPMatrix", mCamera.getProjectionMatrix() );
 
@@ -150,10 +165,6 @@ void RoughSeasApp::draw() {
 	mat.invert();
 	mat.transpose();
 	mShader.uniform( "uNMatrix", mat );
-
-
-//	ci::Vec3f lightDirection( this->getMousePos(), 0.0f );
-//	std::cout << lightDirection.safeNormalized() << std::endl;
 
 	// Light properties
 	mShader.uniform("uLightDirection",  m_uLightDirection );
@@ -168,20 +179,17 @@ void RoughSeasApp::draw() {
 	mShader.uniform("uMaterialAmbient", ci::ColorA(0.7f, 0.7f, 0.7f, 1.0f ) );
 	mShader.uniform("uMaterialDiffuse", ci::ColorA( endColor.x, endColor.y, endColor.z, 1.0f ) );
 	mShader.uniform("uMaterialSpecular", ci::ColorA::white() );
-
-	// Shininess
 	mShader.uniform("uShininess", m_uSpecularFactor );
 
-
 	ci::gl::draw( mTriMesh );
-	ci::gl::draw( bird );
+	//ci::gl::draw( bird );;;
 	mShader.unbind();
 
 	if( m_drawWireframe ) {
 		ci::gl::color( ci::ColorA(0.5, 0.5, 0.5, 0.5) );
 		ci::gl::enableWireframe();
 		ci::gl::draw( mTriMesh );
-		ci::gl::draw( bird );
+	//	ci::gl::draw( bird );
 		ci::gl::disableWireframe();
 	}
 

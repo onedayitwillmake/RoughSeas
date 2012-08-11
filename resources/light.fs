@@ -6,11 +6,16 @@
 precision highp float;
 #endif
 
+
+
 uniform float uShininess;
 uniform vec3 uLightDirection;
 uniform vec4 uLightAmbient;
 uniform vec4 uLightDiffuse;
 uniform vec4 uLightSpecular;
+
+uniform vec3 uRotation;
+uniform vec3 uTranslation;
 
 uniform vec4 uMaterialAmbient;
 uniform vec4 uMaterialDiffuse;

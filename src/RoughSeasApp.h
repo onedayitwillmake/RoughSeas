@@ -43,6 +43,10 @@ public:
 	ci::Vec3f					m_uLightDirection;
 	ci::ColorA					m_uColor;
 	float						m_uSpecularFactor;
+
+	ci::Vec3f					m_uRotation;
+	ci::Vec3f					m_uTranslation;
+
 	float						m_perlinScale;
 	bool						m_drawWireframe;
 };
