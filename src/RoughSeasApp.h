@@ -49,4 +49,8 @@ public:
 
 	float						m_perlinScale;
 	bool						m_drawWireframe;
+
+	float sphereSize;
+	int	azimuth;
+	int elevation;
 };

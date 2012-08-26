@@ -20,9 +20,12 @@ void RoughSeasApp::setup() {
 	setAlwaysOnTop( true );
 
 	ci::Perlin noise;
-	zoa::DrawUtils::createPlaneWithTriMesh( mTriMesh, 100, 100 );
+	zoa::DrawUtils::createPlaneWithTriMesh( mTriMesh, 10, 10 );
 
 	///// CAMERA
+	elevation = 0;
+	azimuth = 0;
+	sphereSize = 1;
 	mEyePoint = ci::Vec3f(85.0f, 10.0f, 100.0f );
 	mCamera.setPerspective( 65.0f, this->getWindowAspectRatio(), 5.0f, 3000.0f );
 	mCamera.setWorldUp( ci::Vec3f::yAxis() );
@@ -57,22 +60,22 @@ void RoughSeasApp::setup() {
 
 
 	// Params
-	m_uLightDirection = ci::Vec3f(0.01, 0.85, -0.52 );
-	m_uColor = ci::ColorAf(76, 17, 0);
+	m_uLightDirection = ci::Vec3f(0.00, -1, 0 );
+	m_uColor = ci::ColorAf(255, 255, 255);
 	m_uRotation = ci::Vec3f(1.0, 0.0, 0.0 );
-	m_uTranslation = ci::Vec3f(10.0f, 0.0, 5.0f);
+	m_uTranslation = ci::Vec3f(0.0f, 0.0, 0.0f);
 
 	m_perlinScale = 11.0f;
-	m_uSpecularFactor = 2.0;
+	m_uSpecularFactor = 6.0;
 	m_drawWireframe = false;
 
 	mParams = ci::params::InterfaceGl( "App parameters", ci::Vec2i( 200, 400 ) );
-	mParams.addParam( "Color", &m_uColor, "min=0.0 max=1.0 step=0.05" );
+	mParams.addParam( "Color", &m_uColor, "min=0 max=1 step=0.05" );
 	mParams.addParam( "Rotation", &m_uRotation);
-	mParams.addParam( "Position", &m_uTranslation);
+	mParams.addParam( "Position", &m_uTranslation, "min=0 max=100 step=1"	);
 
 
-	mParams.addParam( "Light Direction", &m_uLightDirection, "min=0.0 max=1.0 step=0.05" );
+	mParams.addParam( "Light Direction", &m_uLightDirection, "min=0.0 max=1 step=0.05" );
 	mParams.addParam( "Shininess", &m_uSpecularFactor, "min=1 max=255 step=1" );
 	mParams.addParam( "Perlin Scale", &m_perlinScale, "min=1 max=255 step=1" );
 	mParams.addParam( "Draw Wireframe", &m_drawWireframe );
@@ -100,13 +103,31 @@ void RoughSeasApp::keyDown( ci::app::KeyEvent event ) {
 
 	if( event.getChar() == KeyEvent::KEY_q ) quit();
 
-	float amountToMove = 5.0f;
+	int amountToMove = 5;
 	switch( event.getCode() ) {
-		case KeyEvent::KEY_LEFT:	mEyePoint.x -= amountToMove; break;
-		case KeyEvent::KEY_RIGHT:	mEyePoint.x += amountToMove; break;
-		case KeyEvent::KEY_UP:		mEyePoint.z -= amountToMove; break;
-		case KeyEvent::KEY_DOWN:	mEyePoint.z += amountToMove; break;
+		case KeyEvent::KEY_LEFT:	azimuth -= amountToMove; break;
+		case KeyEvent::KEY_RIGHT:	azimuth += amountToMove; break;
+		case KeyEvent::KEY_UP:
+			if( event.isShiftDown( ) ) sphereSize += 1;
+			else elevation+=amountToMove;
+		break;
+		case KeyEvent::KEY_DOWN:
+			if( event.isShiftDown( ) ) sphereSize -= 1;
+			else elevation -= amountToMove;
+		break;
 	}
+
+	azimuth %= 360;
+	elevation %= 360;
+	float theta = elevation * M_PI/180.0f;
+	float phi = azimuth * M_PI/180.0f;
+
+	// Convert spehrical cordinate to cartesian coordiantes
+	mEyePoint.set(
+			cosf((float)theta) * sinf((float)phi) * sphereSize,
+			sinf((float)theta) * sphereSize,
+			cosf((float)theta) * -cosf((float)phi) * sphereSize);
+	std::cout << mCamera.getEyePoint() << std::endl;
 }
 
 // All logic updates here
@@ -176,13 +197,14 @@ void RoughSeasApp::draw() {
 	ci::Vec3f endColor = ci::Vec3f(m_uColor.r, m_uColor.g, m_uColor.b );
 	endColor.safeNormalize();
 
-	mShader.uniform("uMaterialAmbient", ci::ColorA(0.7f, 0.7f, 0.7f, 1.0f ) );
+	mShader.uniform("uMaterialAmbient", ci::ColorA(0.0f, 0.0f, 0.0f, 1.0f ) );
 	mShader.uniform("uMaterialDiffuse", ci::ColorA( endColor.x, endColor.y, endColor.z, 1.0f ) );
 	mShader.uniform("uMaterialSpecular", ci::ColorA::white() );
 	mShader.uniform("uShininess", m_uSpecularFactor );
 
 	ci::gl::draw( mTriMesh );
 	//ci::gl::draw( bird );;;
+//	ci::gl::drawCube( ci::Vec3f(0.0f,0.0f,0.0f), ci::Vec3f(5.0f, 5.0f, 5.0f) );
 	mShader.unbind();
 
 	if( m_drawWireframe ) {
