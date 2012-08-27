@@ -46,13 +46,13 @@ mat4 translation( in vec3 position ) {
 
 void main( void ) {
 	vec4 vertex = vec4(gl_Vertex.xyz, 1.0);
-
-	// vertex = vertex;//* rotationX(uRotation.x) * rotationY(uRotation.y) * rotationZ(uRotation.z) * translation(uTranslation);
+	vertex = vertex * rotationX(uRotation.x) * rotationY(uRotation.y) * rotationZ(uRotation.z) * translation(uTranslation);
+	
 	// Transformed vertex position
 	vertex = uMVMatrix * vertex;
 	
 	// Transformed vertexPosition
-	vNormal = vec3(uNMatrix * vec4(gl_Normal, 1.0));
+	vNormal = vec3(uNMatrix * vec4(gl_Normal, 0.0));
 	vEyeVec = -vec3( vertex.xyz );
 	
 	// * rotationX(uTimer*5.0)

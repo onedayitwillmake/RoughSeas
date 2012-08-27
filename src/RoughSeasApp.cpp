@@ -20,7 +20,8 @@ void RoughSeasApp::setup() {
 	setAlwaysOnTop( true );
 
 	ci::Perlin noise;
-	zoa::DrawUtils::createPlaneWithTriMesh( mTriMesh, 10, 10 );
+	zoa::DrawUtils::createPlaneWithTriMesh( mTriMesh, 100, 100 );
+	bird.setup();
 
 	///// CAMERA
 	elevation = 0;
@@ -41,24 +42,6 @@ void RoughSeasApp::setup() {
 		quit();
 	}
 
-	// Make a bird
-	bird.appendVertex( ci::Vec3f( 5, 0, 0 ) );
-	bird.appendVertex( ci::Vec3f( -5, -2, 1 ) );
-	bird.appendVertex( ci::Vec3f( -5, 0, 0 ) );
-	bird.appendVertex( ci::Vec3f( -5, -2, -1 ) );
-
-	bird.appendVertex( ci::Vec3f( 0, 2, -6 ) );
-	bird.appendVertex( ci::Vec3f( 0, 2, 6 ) );
-	bird.appendVertex( ci::Vec3f( 2, 0, 0 ) );
-	bird.appendVertex( ci::Vec3f( -3, 0, 0 ) );
-
-	bird.appendTriangle(0,2,1);
-	bird.appendTriangle(4,7,6);
-	bird.appendTriangle(5,6,7);
-
-	zoa::DrawUtils::calculateTrimeshNormals( bird );
-
-
 	// Params
 	m_uLightDirection = ci::Vec3f(0.00, -1, 0 );
 	m_uColor = ci::ColorAf(255, 255, 255);
@@ -70,14 +53,15 @@ void RoughSeasApp::setup() {
 	m_drawWireframe = false;
 
 	mParams = ci::params::InterfaceGl( "App parameters", ci::Vec2i( 200, 400 ) );
-	mParams.addParam( "Color", &m_uColor, "min=0 max=1 step=0.05" );
+
+	mParams.addParam( "Color", &m_uColor );
 	mParams.addParam( "Rotation", &m_uRotation);
-	mParams.addParam( "Position", &m_uTranslation, "min=0 max=100 step=1"	);
+	mParams.addParam( "Position", &m_uTranslation );
 
 
-	mParams.addParam( "Light Direction", &m_uLightDirection, "min=0.0 max=1 step=0.05" );
-	mParams.addParam( "Shininess", &m_uSpecularFactor, "min=1 max=255 step=1" );
-	mParams.addParam( "Perlin Scale", &m_perlinScale, "min=1 max=255 step=1" );
+	mParams.addParam( "Light Direction", &m_uLightDirection );
+	mParams.addParam( "Shininess", &m_uSpecularFactor );
+	mParams.addParam( "Perlin Scale", &m_perlinScale );
 	mParams.addParam( "Draw Wireframe", &m_drawWireframe );
 }
 
@@ -177,8 +161,6 @@ void RoughSeasApp::draw() {
 
 	// Camera properties
 	mShader.bind();
-	mShader.uniform( "uTranslation", m_uTranslation );
-	mShader.uniform( "uRotation", rotation );
 	mShader.uniform( "uMVMatrix", mCamera.getModelViewMatrix() );
 	mShader.uniform( "uPMatrix", mCamera.getProjectionMatrix() );
 
@@ -201,16 +183,18 @@ void RoughSeasApp::draw() {
 	mShader.uniform("uMaterialDiffuse", ci::ColorA( endColor.x, endColor.y, endColor.z, 1.0f ) );
 	mShader.uniform("uMaterialSpecular", ci::ColorA::white() );
 	mShader.uniform("uShininess", m_uSpecularFactor );
+	//ci::gl::draw( mTriMesh );
 
-	ci::gl::draw( mTriMesh );
-	//ci::gl::draw( bird );;;
-//	ci::gl::drawCube( ci::Vec3f(0.0f,0.0f,0.0f), ci::Vec3f(5.0f, 5.0f, 5.0f) );
+	mShader.uniform( "uTranslation", bird.getTranslation() );
+	mShader.uniform( "uRotation", bird.getRotation() );
+	ci::gl::draw( bird.getGeometry() );
+
 	mShader.unbind();
 
 	if( m_drawWireframe ) {
 		ci::gl::color( ci::ColorA(0.5, 0.5, 0.5, 0.5) );
 		ci::gl::enableWireframe();
-		ci::gl::draw( mTriMesh );
+//		ci::gl::draw( mTriMesh );
 	//	ci::gl::draw( bird );
 		ci::gl::disableWireframe();
 	}

@@ -9,6 +9,7 @@
 #include "cinder/Perlin.h"
 #include "cinder/params/Params.h"
 #include "Resources.h"
+#include "Bird.h"
 
 class RoughSeasApp : public ci::app::AppBasic {
 public:
@@ -36,7 +37,7 @@ public:
 	ci::gl::VboMesh		mVboMesh;
 
 	ci::Perlin			noise;
-	ci::TriMesh			bird;
+	Bird				bird;
 
 	//
 	ci::params::InterfaceGl		mParams;
